@@ -2,7 +2,7 @@
 
 The [OpenClinica Community edition](https://www.openclinica.com/community-edition-open-source-edc/) is free and open source and is distributed under the [GNU LGPL license](https://www.openclinica.com/gnu-lgpl-open-source-license). 
 
-This repository contains the *Dockerfile*, a startup script and the following instructions for running a Docker container  which you can use to give OpenClinica a try. An image built with this Dockerfile is available on [Docker Hub](https://registry.hub.docker.com/u/piegsaj/openclinica/).
+This repository contains the *Dockerfile*, a startup script and the following instructions for running a Docker container  which you can use to give OpenClinica a try. An image built with this Dockerfile is available on [Docker Hub](https://cloud.docker.com/repository/docker/dahoba/openclinica).
 
 > **IMPORTANT:** *This image is meant for trying out OpenClinica and not meant for running a production server or for storing important study data.*
 
