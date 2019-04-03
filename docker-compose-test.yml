@@ -1,0 +1,12 @@
+version: '3'
+services:
+  db:
+    image: "postgres:9.5-alpine"
+    environment:
+      POSTGRES_PASSWORD: "clinica"
+      POSTGRES_INITDB_ARGS: "-E 'UTF-8' --locale=POSIX"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../db-data-test:/var/lib/postgresql/data
+      - ./init-test-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh

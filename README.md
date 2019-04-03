@@ -1,4 +1,4 @@
-# OpenClinica 3.13 via Docker
+# OpenClinica 3.14 via Docker
 
 The [OpenClinica Community edition](https://www.openclinica.com/community-edition-open-source-edc/) is free and open source and is distributed under the [GNU LGPL license](https://www.openclinica.com/gnu-lgpl-open-source-license). 
 
@@ -18,14 +18,20 @@ This repository contains the *Dockerfile*, a startup script and the following in
 * Create a file `init-db.sh` that adds a user and a database for OpenClinica to PostgreSQL:
 
 ```sh
-#!/bin/bash
+#!/bin/sh
 set -e
+# Perform all actions as $POSTGRES_USER
+export PGUSER="$POSTGRES_USER"
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-    CREATE ROLE clinica LOGIN ENCRYPTED PASSWORD 'clinica' SUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE;
-    CREATE DATABASE openclinica WITH ENCODING='UTF8' OWNER=clinica;
+echo "Init openclinica db into $POSTGRES_DB"
+"${psql[@]}" <<- 'EOSQL'
+\dx;
+  CREATE ROLE clinica LOGIN ENCRYPTED PASSWORD 'clinica' SUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE;
+  CREATE DATABASE openclinica WITH ENCODING='UTF8' OWNER=clinica;
 EOSQL
 ```
+
+`//TODO` 
 
 * Please adjust the database password
 
@@ -97,8 +103,3 @@ docker container run --rm \
  piegsaj/openclinica:oc-3.13 \
  tar cvf /tmp/oc_data_backup_$(date +%Y-%m-%d_%H-%M-%S).tar /tomcat/openclinica.data
 ```
-
-## Contribute
-
-Feedback is welcome. The source is available on [Github](https://github.com/JensPiegsa/OpenClinica/). Please [report any issues](https://github.com/JensPiegsa/OpenClinica/issues).
-

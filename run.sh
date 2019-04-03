@@ -9,8 +9,6 @@ sed -i "/^dbHost=.*/c\dbHost=$DB_HOST" ${PROPS}
 sed -i "/^db=.*/c\db=$DB_NAME" ${PROPS}
 sed -i "/^dbPort=.*/c\dbPort=$DB_PORT" ${PROPS}
 sed -i "/^userAccountNotification=.*/c\userAccountNotification=admin" ${PROPS}
-sed -i "/^# about\.text1=.*/c\about.text1= Powered by" ${PROPS}
-sed -i "/^# about\.text2=.*/c\about.text2= mosaic-greifswald.de" ${PROPS}
 sed -i "/^# supportURL=.*/c\supportURL=$SUPPORT_URL" ${PROPS}
 sed -i "/^collectStats=.*/c\collectStats=false" ${PROPS}
 sed -i "/^designerURL=.*/c\designerURL=" ${PROPS}

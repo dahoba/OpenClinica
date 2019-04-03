@@ -1,0 +1,30 @@
+version: '3'
+services:
+  web:
+    image: "dahoba/openclinica"
+    build: .
+    environment:
+      - TZ="UTC+7"
+      - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_NAME=openclinica
+      - DB_USER=clinica
+      - DB_PASS=clinica
+      - DB_PORT=5432
+    volumes:
+      - "./logs/tomcat-logs:/usr/local/tomcat/logs"
+    ports:
+      - "8080:8080"
+    depends_on: 
+      - db
+  db:
+    image: "postgres:9.5-alpine"
+    environment:
+      TZ: "UTC+7"
+      POSTGRES_PASSWORD: "jollyfawn28"
+      POSTGRES_INITDB_ARGS: "-E 'UTF-8' --locale=POSIX"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
