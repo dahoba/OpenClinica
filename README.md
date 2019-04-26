@@ -1,4 +1,4 @@
-# OpenClinica 3.14 via Docker
+# OpenClinica docker image
 
 The [OpenClinica Community edition](https://www.openclinica.com/community-edition-open-source-edc/) is free and open source and is distributed under the [GNU LGPL license](https://www.openclinica.com/gnu-lgpl-open-source-license). 
 
@@ -8,7 +8,7 @@ This repository contains the *Dockerfile*, a startup script and the following in
 
 ## Setup
 
-### 0. Install Docker
+### 0. Install Docker & docker compose
 
 * Follow the [installation instructions](http://docs.docker.com/installation/) for your host system
 * *If you are running Docker on VirtualBox:* the maximum RAM size can be adjusted through the user interface of VirtualBox (run it from the start menu, stop the virtual machine, change the configuration to e.g. 4096MB, close it and start the virtual machine using `docker-machine`)
@@ -31,44 +31,62 @@ echo "Init openclinica db into $POSTGRES_DB"
 EOSQL
 ```
 
-`//TODO` 
-
-* Please adjust the database password
-
 ### 2. Start a PostgreSQL database server
+
+Modify where is the db-data folder to keep the postgresql data file on the OS
 
 * This expects the `init-db.sh` script residing in the current directory
 
 ```sh
-docker container run --name ocdb -d -v ocdb-data:/var/lib/postgresql/data \
- -v $PWD/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh \
- -p 5432:5432 \
- -e POSTGRES_INITDB_ARGS="-E 'UTF-8' --locale=POSIX" \
- -e POSTGRES_PASSWORD=postgres123 \
- postgres:9.5
+...
+  db:
+    image: "postgres:9.5-alpine"
+    environment:
+      TZ: "UTC+7"
+      POSTGRES_PASSWORD: "jollyfawn28"
+      POSTGRES_INITDB_ARGS: "-E 'UTF-8' --locale=POSIX"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
+```
+
+start postgresql with `docker-compose`
+
+```
+docker-compose up -d
 ```
 
 * Please change the root database password
 
 ### 3. Start Tomcat serving OpenClinica and OpenClinica-ws
 
-```sh
-docker container run --name oc -h oc -d -v oc-data:/usr/local/tomcat/openclinica.data \
- -p 80:8080 \
- -e LOG_LEVEL=INFO \
- -e TZ=UTC-1 \
- -e DB_TYPE=postgres \
- -e DB_HOST=192.168.99.100 \
- -e DB_NAME=openclinica \
- -e DB_USER=clinica \
- -e DB_PASS=clinica \
- -e DB_PORT=5432 \
- -e SUPPORT_URL="https://www.openclinica.com/community-edition-open-source-edc/" \
- piegsaj/openclinica:oc-3.13
-```
-
 * Adjust `DB_HOST` and passwords accordingly
 * The environment variables for log level and timezone are optional here.
+
+```
+  web:
+    image: "dahoba/openclinica"
+    environment:
+      - TZ="UTC+7"
+      - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_NAME=openclinica
+      - DB_USER=clinica
+      - DB_PASS=clinica
+      - DB_PORT=5432
+    volumes:
+      - "./logs/tomcat-logs:/usr/local/tomcat/logs"
+      - "./app-data/openclinica.data:/usr/local/tomcat/openclinica.data"
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "usage.openclinica.com:127.0.0.1"
+      - "designer13.openclinica.com:127.0.0.1"
+    depends_on: 
+      - db
+```
 
 ### 4. Run OpenClinica
 
@@ -80,26 +98,20 @@ docker container run --name oc -h oc -d -v oc-data:/usr/local/tomcat/openclinica
 **To show the OpenClinica logs:**
 
 ```sh
-docker container logs -f oc
+docker logs -f openclinica-docker_web_1
 ```
 
-**To backup a database dump to the current directory on the host:**
+## Build image from source
+
+1. clone (Openclinica)[https://github.com/OpenClinica/OpenClinica]
+2. clone this repo into OpenClinica folder as `docker` folder
+3. `cd OpenClinica/docker` 
+4. modify the `docker-compose.yml` un-comment 
 
 ```
-echo "postgres123" | docker container run -i --rm \
- --link ocdb:ocdb \
- -v $PWD:/tmp \
- postgres:9.5 sh -c '\
- pg_dump -h ocdb -p $OCDB_PORT_5432_TCP_PORT -U postgres -F tar -v openclinica \
- > /tmp/ocdb_pg_dump_$(date +%Y-%m-%d_%H-%M-%S).tar'
+     build:
+       context: ../
+       dockerfile: docker/Dockerfile
 ```
 
-**To backup the OpenClinica data folder to the current directory on the host:**
-
-```sh
-docker container run --rm \
- -v oc-data:/tomcat/openclinica.data \
- -v $PWD:/tmp \
- piegsaj/openclinica:oc-3.13 \
- tar cvf /tmp/oc_data_backup_$(date +%Y-%m-%d_%H-%M-%S).tar /tomcat/openclinica.data
-```
+5. execute `docker-compose build`. This will take the source code to compile while building docker image.

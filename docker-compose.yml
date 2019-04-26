@@ -1,8 +1,10 @@
 version: '3'
 services:
   web:
-    image: "dahoba/openclinica"
-    build: .
+    image: "openclinica"
+    # build:
+      # context: ../
+      # dockerfile: docker/Dockerfile
     environment:
       - TZ="UTC+7"
       - DB_TYPE=postgres
@@ -13,8 +15,12 @@ services:
       - DB_PORT=5432
     volumes:
       - "./logs/tomcat-logs:/usr/local/tomcat/logs"
+      - "./app-data/openclinica.data:/usr/local/tomcat/openclinica.data"
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "usage.openclinica.com:127.0.0.1"
+      - "designer13.openclinica.com:127.0.0.1"
     depends_on: 
       - db
   db:
@@ -27,4 +33,4 @@ services:
       - "5432:5432"
     volumes:
       - ./db-data:/var/lib/postgresql/data
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
+      - ./init-openclinica-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
