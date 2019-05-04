@@ -1,23 +1,10 @@
 version: '3'
 services:
-  rproxy:
-    image: "nginx:1.16-alpine"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./conf/nginx-config.conf:/etc/nginx/conf.d/oc.conf
-      - ./conf/certs/localhost+2.pem:/usr/local/ssl/my-server.crt
-      - ./conf/certs/localhost+2-key.pem:/usr/local/ssl/my-server.key
-      - webimage:/usr/local/tomcat/webapps/OpenClinica/images
-      - webinclude:/usr/local/tomcat/webapps/OpenClinica/includes
-    depends_on: 
-      - web
   web:
-    image: "dahoba/openclinica:3.14-tomcat7"
-    # build:
-    #   context: ../
-    #   dockerfile: docker/Dockerfile
+    image: "dahoba/openclinica"
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
     environment:
       - TZ="UTC+7"
       - DB_TYPE=postgres
@@ -26,16 +13,10 @@ services:
       - DB_USER=clinica
       - DB_PASS=clinica
       - DB_PORT=5432
-      # - "CATALINA_OPTS=-Djava.net.preferIPv4Stack=true"
     volumes:
       - "./logs/tomcat-logs:/usr/local/tomcat/logs"
-      - "./conf/tomcat-server.xml:/usr/local/tomcat/conf/server.xml"
-      # - "/Users/siritas_s/workspace/clinical_workspace/OpenClinica/web/target/OpenClinica-web-3.14:/usr/local/tomcat/webapps/OpenClinica"
-      - "./app-data/openclinica.data:/usr/local/tomcat/openclinica.data"
-      - "webimage:/usr/local/tomcat/webapps/OpenClinica/images"
-      - "webinclude:/usr/local/tomcat/webapps/OpenClinica/includes"
-    # ports:
-      # - "8080:8080"
+    ports:
+      - "8080:8080"
     extra_hosts:
       - "usage.openclinica.com:127.0.0.1"
       - "designer13.openclinica.com:127.0.0.1"
@@ -50,8 +31,5 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db-data:/var/lib/postgresql/data
+      - ../db-data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
-volumes:
-  webimage:
-  webinclude:

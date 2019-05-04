@@ -31,21 +31,35 @@ COPY docker/run.sh               /run.sh
 COPY --from=builder /usr/src/openclinica/web/target/OpenClinica-web-3.14.war /tmp/oc/OpenClinica.war
 COPY --from=builder /usr/src/openclinica/ws/target/OpenClinica-ws-3.14.war /tmp/oc/OpenClinica-ws.war
 ADD https://jdbc.postgresql.org/download/postgresql-42.2.5.jar /tmp/oc/postgresql-42.2.5.jar
+#COPY OpenClinica-ws-3.14.zip /tmp/oc/OpenClinica-ws.zip
+#COPY OpenClinica-3.14.zip /tmp/oc/OpenClinica.zip
 
 #### Remove default webapps
 RUN  cd /tmp/oc && \
+#     wget -q --no-check-certificate -Opostgresql-42.2.5.jar https://jdbc.postgresql.org/download/postgresql-42.2.5.jar && \
+#     unzip OpenClinica-ws.zip && \
+#     unzip OpenClinica.zip && \
      rm -rf $CATALINA_HOME/webapps/* && \
      mkdir -p $OC_HOME && cd $OC_HOME && pwd && cd && \
      mkdir -p $OC_WS_HOME && cd $OC_WS_HOME && pwd  && cd && \
      unzip /tmp/oc/OpenClinica.war -qd $OC_HOME && \
      unzip /tmp/oc/OpenClinica-ws.war -qd $OC_WS_HOME && \
+#oc web
+#     cp /tmp/oc/OpenClinica-$OC_VERSION/distribution/OpenClinica.war /tmp/oc && \
+#     unzip -q /tmp/oc/OpenClinica.war && cd .. && \
+#oc webservice
+#     mkdir $OC_WS_HOME && cd $OC_WS_HOME && \
+#     cp /tmp/oc/OpenClinica-ws-$OC_VERSION/distribution/OpenClinica-ws.war /tmp/oc && \
+#     unzip -q /tmp/oc/OpenClinica-ws.war && cd .. && \
+#     rm -f $OC_HOME/WEB-INF/lib/postgresql-*.jar && \
      cp /tmp/oc/postgresql-42.2.5.jar $OC_HOME/WEB-INF/lib/ && \
 #clean tmp folder
      rm -rf /tmp/oc && \
+#
      mkdir $CATALINA_HOME/openclinica.data/xslt -p && \
+#     mv $CATALINA_HOME/webapps/OpenClinica/WEB-INF/lib/servlet-api-2.3.jar ../ && \
      chmod +x /*.sh
 
 ENV  JAVA_OPTS -Xmx1280m -XX:+UseParallelGC -XX:+CMSClassUnloadingEnabled
 
 CMD  ["/run.sh"]
-
