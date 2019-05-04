@@ -11,11 +11,13 @@ services:
       - ./conf/certs/localhost+2-key.pem:/usr/local/ssl/my-server.key
       - webimage:/usr/local/tomcat/webapps/OpenClinica/images
       - webinclude:/usr/local/tomcat/webapps/OpenClinica/includes
+    depends_on: 
+      - web
   web:
-    image: "dahoba/openclinica"
+    image: "dahoba/openclinica:3.14-tomcat7"
     # build:
-      # context: ../
-      # dockerfile: docker/Dockerfile
+    #   context: ../
+    #   dockerfile: docker/Dockerfile
     environment:
       - TZ="UTC+7"
       - DB_TYPE=postgres
@@ -24,11 +26,11 @@ services:
       - DB_USER=clinica
       - DB_PASS=clinica
       - DB_PORT=5432
-      - "CATALINA_OPTS=-Djava.net.preferIPv4Stack=true"
+      # - "CATALINA_OPTS=-Djava.net.preferIPv4Stack=true"
     volumes:
       - "./logs/tomcat-logs:/usr/local/tomcat/logs"
       - "./conf/tomcat-server.xml:/usr/local/tomcat/conf/server.xml"
-      - "/Users/siritas_s/workspace/clinical_workspace/OpenClinica/web/target/OpenClinica-web-3.14:/usr/local/tomcat/webapps/OpenClinica"
+      # - "/Users/siritas_s/workspace/clinical_workspace/OpenClinica/web/target/OpenClinica-web-3.14:/usr/local/tomcat/webapps/OpenClinica"
       - "./app-data/openclinica.data:/usr/local/tomcat/openclinica.data"
       - "webimage:/usr/local/tomcat/webapps/OpenClinica/images"
       - "webinclude:/usr/local/tomcat/webapps/OpenClinica/includes"
@@ -49,7 +51,7 @@ services:
       - "5432:5432"
     volumes:
       - ./db-data:/var/lib/postgresql/data
-      - ./init-openclinica-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
 volumes:
   webimage:
   webinclude:

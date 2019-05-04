@@ -21,7 +21,7 @@ COPY ws/src ws/src
 RUN mvn -B -DskipTests verify
 
 ## second steps deploy
-FROM tomcat:8-jre8-alpine
+FROM tomcat:7-jre8-alpine
 
 ENV  OC_HOME              $CATALINA_HOME/webapps/OpenClinica
 ENV  OC_WS_HOME           $CATALINA_HOME/webapps/OpenClinica-ws
