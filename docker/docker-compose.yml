@@ -1,8 +1,10 @@
 version: '3'
 services:
   web:
-    image: "openclinica"
-    build: .
+    image: "dahoba/openclinica"
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
     environment:
       - TZ="UTC+7"
       - DB_TYPE=postgres
@@ -30,4 +32,4 @@ services:
       - "5432:5432"
     volumes:
       - ../db-data:/var/lib/postgresql/data
-      - ./init-openclinica-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh

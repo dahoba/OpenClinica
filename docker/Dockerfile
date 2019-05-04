@@ -1,5 +1,5 @@
-#FROM maven:3.5.2-alpine as builder
-FROM maven:3.6-amazoncorretto-8 as builder
+FROM maven:3.6-alpine as builder
+#FROM maven:3.6-amazoncorretto-8 as builder
 
 LABEL MAINTAINER="Siritas Dho (siritas@gmail.com)"
 
@@ -21,7 +21,7 @@ COPY ws/src ws/src
 RUN mvn -B -DskipTests verify
 
 ## second steps deploy
-FROM tomcat:9-jre8-alpine
+FROM tomcat:7-jre8-alpine
 
 ENV  OC_HOME              $CATALINA_HOME/webapps/OpenClinica
 ENV  OC_WS_HOME           $CATALINA_HOME/webapps/OpenClinica-ws
@@ -63,4 +63,3 @@ RUN  cd /tmp/oc && \
 ENV  JAVA_OPTS -Xmx1280m -XX:+UseParallelGC -XX:+CMSClassUnloadingEnabled
 
 CMD  ["/run.sh"]
-
