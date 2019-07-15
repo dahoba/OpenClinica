@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    image: "dahoba/openclinica"
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.designer
+    environment:
+      - TZ="UTC+7"
+    volumes:
+      - "m2vol:/root/.m2"
+    # ports:
+      # - "8080:8080"
+    # extra_hosts:
+      # - "usage.openclinica.com:127.0.0.1"
+      # - "designer13.openclinica.com:127.0.0.1"
+volumes:
+  m2vol:

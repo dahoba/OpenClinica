@@ -1,0 +1,23 @@
+FROM maven:3.6-jdk-7-alpine as builder
+
+LABEL MAINTAINER="Siritas Dho (siritas@gmail.com)"
+
+ENV JAVA_OPTS=""
+ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+RUN mkdir -p /usr/src/oc/designer
+WORKDIR /usr/src/oc/designer
+
+COPY Designer/openclinica-odm-2.2.jar .
+RUN mvn -U install:install-file -DgroupId=org.akaza.openclinica.odm -DartifactId=openclinica-odm -Dversion=2.2 -Dpackaging=jar -Dfile=openclinica-odm-2.2.jar -DgeneratePom=true
+
+COPY Designer/pom.xml .
+RUN mvn -B --fail-never verify
+
+COPY Designer/src ./src
+RUN mvn -B -DskipTests verify
+
+## second steps deploy
+# FROM tomcat:7-jre8-alpine
+
+VOLUME /usr/src/openclinica/target
