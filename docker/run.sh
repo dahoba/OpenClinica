@@ -11,7 +11,7 @@ sed -i "/^dbPort=.*/c\dbPort=$DB_PORT" ${PROPS}
 sed -i "/^userAccountNotification=.*/c\userAccountNotification=admin" ${PROPS}
 sed -i "/^# supportURL=.*/c\supportURL=$SUPPORT_URL" ${PROPS}
 sed -i "/^collectStats=.*/c\collectStats=false" ${PROPS}
-sed -i "/^designerURL=.*/c\designerURL=" ${PROPS}
+sed -i "/^designerURL=.*/c\designerURL=$DESIGNER_URL" ${PROPS}
 
 cp ${PROPS} ${CATALINA_HOME}/webapps/OpenClinica-ws/WEB-INF/classes/
 

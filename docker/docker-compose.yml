@@ -1,10 +1,11 @@
-version: '3'
+version: "3"
 services:
   web:
-    image: "dahoba/openclinica"
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
+    image: "registry.gitlab.com/siritas/openclinica/web"
+    # image: "dahoba/openclinica"
+    # build:
+    #   context: ../
+    #   dockerfile: docker/Dockerfile
     environment:
       - TZ="UTC+7"
       - DB_TYPE=postgres
@@ -13,14 +14,20 @@ services:
       - DB_USER=clinica
       - DB_PASS=clinica
       - DB_PORT=5432
+      - DESIGNER_URL=designer.openclinica.loc
+      - VIRTUAL_HOST=app.openclinica.loc
+      - VIRTUAL_PORT=8080
     volumes:
-      - "./logs/tomcat-logs:/usr/local/tomcat/logs"
+      - "./logs/tomcat-w-logs:/usr/local/tomcat/logs"
+      - "webimage:/usr/local/tomcat/webapps/OpenClinica/images"
+      - "webinclude:/usr/local/tomcat/webapps/OpenClinica/includes"
+      # - "/home/Users/siritas_s/.m2:/root/.m2"
     ports:
       - "8080:8080"
-    extra_hosts:
-      - "usage.openclinica.com:127.0.0.1"
-      - "designer13.openclinica.com:127.0.0.1"
-    depends_on: 
+    # extra_hosts:
+    # - "usage.openclinica.com:127.0.0.1"
+    # - "designer13.openclinica.com:127.0.0.1"
+    depends_on:
       - db
   db:
     image: "postgres:9.5-alpine"
@@ -33,3 +40,34 @@ services:
     volumes:
       - ../db-data:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-openclinica.sh
+  adminer:
+    image: "adminer:4.7"
+    environment:
+      ADMINER_PLUGINS: "tables-filter tinymce table-structure"
+      ADMINER_DESIGN: "arcs-material"
+      VIRTUAL_HOST: "db.openclinica.loc"
+      VIRTUAL_PORT: "8080"
+  designer:
+    image: "registry.gitlab.com/siritas/openclinica/designer"
+    environment:
+      - TZ="UTC+7"
+      - VIRTUAL_HOST=designer.openclinica.loc
+      - VIRTUAL_PORT=8080
+    volumes:
+      - "./logs/tomcat-d-logs:/usr/local/tomcat/logs"
+    # ports:
+    # - "8090:8080"
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - webimage:/usr/local/tomcat/webapps/OpenClinica/images
+      - webinclude:/usr/local/tomcat/webapps/OpenClinica/includes
+      # - ./etax-nginx.conf:/etc/nginx/proxy.conf
+    depends_on:
+      - web
+volumes:
+  webimage:
+  webinclude:

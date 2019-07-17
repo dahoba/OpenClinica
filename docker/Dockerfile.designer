@@ -1,23 +1,46 @@
-FROM maven:3.6-jdk-7-alpine as builder
-
+FROM tomcat:7-jre8-alpine
 LABEL MAINTAINER="Siritas Dho (siritas@gmail.com)"
 
-ENV JAVA_OPTS=""
-ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+#ENV  OC_HOME              $CATALINA_HOME/webapps/OpenClinica
+#ENV  OC_WS_HOME           $CATALINA_HOME/webapps/OpenClinica-ws
+ENV  OC_DS_HOME           $CATALINA_HOME/webapps/Designer
+ENV  OC_VERSION           3.14
 
-RUN mkdir -p /usr/src/oc/designer
-WORKDIR /usr/src/oc/designer
+COPY docker/run.sh    /run.sh
+# COPY --from=builder /usr/src/openclinica/web/target/OpenClinica-web-3.14.war /tmp/oc/OpenClinica.war
+# COPY --from=builder /usr/src/openclinica/ws/target/OpenClinica-ws-3.14.war /tmp/oc/OpenClinica-ws.war
+# COPY --from=designer /usr/src/oc/designer/target/Designer-1.1.war /tmp/oc/Designer.war
 
-COPY Designer/openclinica-odm-2.2.jar .
-RUN mvn -U install:install-file -DgroupId=org.akaza.openclinica.odm -DartifactId=openclinica-odm -Dversion=2.2 -Dpackaging=jar -Dfile=openclinica-odm-2.2.jar -DgeneratePom=true
+ADD https://jdbc.postgresql.org/download/postgresql-42.2.5.jar /tmp/oc/postgresql-42.2.5.jar
+COPY docker/Designer-1.1.war /tmp/oc/Designer.war
+# COPY docker/OpenClinica-web-3.14.war /tmp/oc/OpenClinica.war
+# COPY docker/OpenClinica-ws-3.14.war /tmp/oc/OpenClinica-ws.war
 
-COPY Designer/pom.xml .
-RUN mvn -B --fail-never verify
+#### Remove default webapps
+RUN  cd /tmp/oc && \
+    rm -rf $CATALINA_HOME/webapps/* \
+#   && mkdir -p $OC_HOME \
+#   && cd $OC_HOME \
+#   && pwd \
+#   && cd \
+#   && mkdir -p $OC_WS_HOME \
+#   && cd $OC_WS_HOME \
+#   && pwd \
+    && mkdir -p $OC_DS_HOME \
+    && cd $OC_DS_HOME \
+    && pwd \    
+    && cd \
+#   && unzip /tmp/oc/OpenClinica.war -qd $OC_HOME \
+#   && unzip /tmp/oc/OpenClinica-ws.war -qd $OC_WS_HOME \
+    # && unzip /tmp/oc/Designer.war -qd $OC_DS_HOME \
+    # oc web
+    && cd $OC_HOME && ls -la \
+    && cp /tmp/oc/postgresql-42.2.5.jar $OC_HOME/WEB-INF/lib/ \
+    #clean tmp folder
+    && rm -rf /tmp/oc \
+    && mkdir -p $CATALINA_HOME/openclinica.data/xslt -p \
+    && chmod +x /*.sh
 
-COPY Designer/src ./src
-RUN mvn -B -DskipTests verify
+ENV  JAVA_OPTS -Xmx1280m -XX:+UseParallelGC -XX:+CMSClassUnloadingEnabled
 
-## second steps deploy
-# FROM tomcat:7-jre8-alpine
-
-VOLUME /usr/src/openclinica/target
+CMD  ["/run.sh"]
