@@ -28,3 +28,4 @@ ws/.DS_Store
 # netbeans
 nb-configuration.xml
 /db-data
+/app-data

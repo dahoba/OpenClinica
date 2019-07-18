@@ -14,11 +14,13 @@ services:
       - DB_USER=clinica
       - DB_PASS=clinica
       - DB_PORT=5432
-      - DESIGNER_URL=designer.openclinica.loc
+      - DESIGNER_URL=http://designer.openclinica.loc/designer/
       - VIRTUAL_HOST=app.openclinica.loc
       - VIRTUAL_PORT=8080
     volumes:
       - "./logs/tomcat-w-logs:/usr/local/tomcat/logs"
+      # filePath
+      - "../app-data:/usr/local/tomcat/openclinica.data"
       - "webimage:/usr/local/tomcat/webapps/OpenClinica/images"
       - "webinclude:/usr/local/tomcat/webapps/OpenClinica/includes"
       # - "/home/Users/siritas_s/.m2:/root/.m2"
