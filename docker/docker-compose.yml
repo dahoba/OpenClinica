@@ -15,6 +15,7 @@ services:
       - DB_PASS=clinica
       - DB_PORT=5432
       - DESIGNER_URL=http://designer.openclinica.loc/designer/
+      - SYS_URL=http://app.openclinica.loc/OpenClinica/MainMenu
       - VIRTUAL_HOST=app.openclinica.loc
       - VIRTUAL_PORT=8080
     volumes:

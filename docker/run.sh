@@ -12,6 +12,8 @@ sed -i "/^userAccountNotification=.*/c\userAccountNotification=admin" ${PROPS}
 sed -i "/^# supportURL=.*/c\supportURL=$SUPPORT_URL" ${PROPS}
 sed -i "/^collectStats=.*/c\collectStats=false" ${PROPS}
 sed -i "/^designerURL=.*/c\designerURL=$DESIGNER_URL" ${PROPS}
+# sed -i "/^sysURL=.*/c\sysURL=$SYS_URL" ${PROPS}
+sed -i "/^sysURL=.*/c\sysURL=http://$VIRTUAL_HOST/OpenClinica/MainMenu" ${PROPS}
 
 cp ${PROPS} ${CATALINA_HOME}/webapps/OpenClinica-ws/WEB-INF/classes/
 
