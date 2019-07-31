@@ -1,0 +1,25 @@
+<RuleImport>
+    <RuleAssignment>
+        <Target Context="OC_RULES_V1">SE_EOSORLFU.F_KITCHENSINK.IG_KITCH_SHOWACTION.I_KITCH_SI1BPHR</Target>
+        <!-- <RunOnSchedule Time="17:00"/> -->
+        <RuleRef OID="R_SHW_BPHR_MEASURE_DONE">
+            
+            <ShowAction IfExpressionEvaluates="true">
+                <Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
+                <Message>Please complete the detail of the measurement</Message>
+                <DestinationProperty OID="IG_KITCH_INSERTACTION" />
+            </ShowAction>
+            <HideAction IfExpressionEvaluates="false">
+                <Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
+                <Message>Please complete the detail of the measurement</Message>
+                <DestinationProperty OID="IG_KITCH_INSERTACTION" />
+            </HideAction>
+        </RuleRef>
+    </RuleAssignment>
+    
+    <RuleDef OID="R_SHW_BPHR_MEASURE_DONE" Name="Pre-fill BP HR measurements">
+        <Description>toggle show/hide of BP&amp;HR field</Description>
+        <Expression>I_KITCH_SI1BPHR eq 1</Expression>
+    </RuleDef>
+    
+</RuleImport>
