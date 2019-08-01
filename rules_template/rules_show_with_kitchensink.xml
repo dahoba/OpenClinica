@@ -11,9 +11,15 @@
             </ShowAction>
             <HideAction IfExpressionEvaluates="false">
                 <Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
-                <Message>Please complete the detail of the measurement</Message>
+                <Message>The log should only be completed if 'Yes' was 
+                    selected for the previous question.</Message>
                 <DestinationProperty OID="IG_KITCH_INSERTACTION" />
             </HideAction>
+            <InsertAction IfExpressionEvaluates="true">
+                <Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
+                <DestinationProperty OID="IG_KITCH_INSERTACTION[1].I_KITCH_SI2MEASR" Value="Blood Pressure"></DestinationProperty>
+                <DestinationProperty OID="IG_KITCH_INSERTACTION[2].I_KITCH_SI2MEASR" Value="Heart Rate"></DestinationProperty>
+            </InsertAction>
         </RuleRef>
     </RuleAssignment>
     
